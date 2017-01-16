@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Streaming Radio Player</title>
+<script>
+	var radioPlayer, radioStatus, radioControls, volumeControl, buttonPlayPause;
+	var stations = {
+		"entries" : [
+			{
+				"name":"1",
+				"url":"audio1.mp3",
+				"type":"mp3"
+			},
+			{
+				"name":"2",
+				"url":"audio2.mp3",
+				"type":"mp3"
+			},
+			{
+				"name":"3",
+				"url":"audio3.mp3",
+				"type":"mp3"
+			}
+		]
+	}
+
+	function init (argument) {
+		radioPlayer = document.getElementById('audioPlayer');
+		radioPlayer.onerror = function  (evt) {
+			 switch (radioPlayer.error.code) {
+			  	case radioPlayer.error.MEDIA_ERR_ABORTED:
+			  		alert("Play has been aborted.");
+			  		break;
+			  	case radioPlayer.error.MEDIA_ERR_NETWORK:
+			  		alert("Network error occurred.");
+			  		break;
+			  	case radioPlayer.error.MEDIA_ERR_DECODE:
+			  		alert("Error occurred while decoding stream.");
+			  		break;
+			  	case radioPlayer.error.MEDIA_ERR_SRC_NOT_SUPPORTED:
+			  		alert("Media resource provided is not suitable.");
+			  		break;
+			  	default:
+			  		alert("Unknown erro occurred:" + radioPlayer.error.code + '.');
+			  		break;
+			  }
+		}
+		radioPlayer.addEventListener("durationchange", streamPlaying,false);
+
+		radioStatus = document.getElementById("radioStatus");
+		radioControls = document.getElementById("radioControls");
+		volumeControl = document.getElementById("volumeControl");
+		buttonPlayPause = document.getElementById("buttonPlayPause");
+
+		setVolume(0.7);
+		loadStations();
+	}
+	function loadStations (argument) {
+		var stationList = document.getElementById("stationList");
+		for (var i = 0; i < stations.entries.length; i++) {
+			var newOption = document.createElement("option");
+			newOption.text = stations.entries[i].name + '(' + stations.entries[i].type + ')';
+			newOption.value = i;
+			try {
+				stationList.add(newOption, null);
+			} catch(e) {
+				stationList.add(newOption)
+			}
+		};
+	}
+	function setStation (argument) {
+		radioStatus.innerHTML = "Buffering...";
+		var selStationList = document.getElementById("stationList");
+		radioPlayer.src = stations.entries[selStationList.selectedIndex].url;
+		radioPlayer.type="audio/" + stations.entries[selStationList.selectedIndex].type;
+		var currentStation = document.getElementById("currentStation");
+		currentStation.innerHTML = stations.entries[selStationList.selectedIndex].name;
+		radioPlayer.play();
+	}
+	function streamPlaying (argument) {
+		radioStatus.innerHTML = "Now playing...";
+		buttonPlayPause.innerHTML = "Pause";
+		radioControls.style.visibility = "visible";
+	}
+	function playPauseClicked (argument) {
+		 if(radioPlayer.ended || radioPlayer.paused){
+		 	playerPlay();
+		 } else{
+		 	playerPause();
+		 }
+	}
+	function playerPlay (argument) {
+		buttonPlayPause.innerHTML = "Pause";
+		radioStatus.innerHTML = "Now playing...";
+		radioPlayer.play();
+	}
+	function playerPause (argument) {
+		buttonPlayPause.innerHTML = "Play";
+		radioStatus.innerHTML = "Paused";
+		radioPlayer.pause();
+	}
+	function setVolume (newVolume) {
+		 radioPlayer.volume = newVolume;
+		 wrapper = document.getElementById('volume_background');
+		 wrapper_width = wrapper.offsetWidth;
+		 newWidth = wrapper_width * newVolume;
+		 volume_bar = document.getElementById('volume_bar');
+		 volume_bar.innerHTML = parseInt(newVolume*100) + '%';
+		 volume_bar.style.width=newWidth +'px'; 
+	}
+	function volumeChangeClicked (event) {
+		var clientX = event.clientX;
+		var offset = clientX - event.currentTarget.offsetLeft;
+		var newVolume = offset/event.currentTarget.offsetWidth;
+		setVolume(newVolume);
+	}
+	window.addEventListener('load', init,false);
+</script>
+<style>
+	*{
+		color: #000;
+		font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+		margin: 0;
+		padding: 0;
+	}
+	#radioContainer {
+		background: #ccc;
+		border: 15px solid rgba(0,0,0,.5);
+		border-radius: 25px;
+		-webkit-box-shadow: 0 0 4px #000;
+		box-shadow: 0 0 35px rgba(1,1,1,.7), inset 0 0 35px rgba(1,1,1,.7);
+		padding: 20px;
+		margin: 40px auto;
+		overflow: hidden;
+		width: 420px;
+	}
+	h1{
+		font-size: 1.8em;
+		margin: 0 0 10px;
+		text-align: center;
+	}
+	h2{
+		margin: 10px 0 5px;
+	}
+	label{
+		left: -9999px;
+		position: absolute;
+	}
+	#stationList{
+		background-color: #fff;
+		border: 1px solid #000;
+		border-radius: 5px;
+		color: #333;
+		cursor: pointer;
+		padding: 5px;
+		text-align: center;
+		width: 100%;
+	}
+	#radioPlayer{
+		float: left;
+		width: 100%;
+	}
+	#currentStation{
+		color: #333;
+		text-shadow: #999;
+	}
+	#radioControls{
+		text-align: left;
+		visibility: hidden;
+		margin-top: 10px;
+	}
+	#radioControls *{
+		float: left;
+	}
+	#volumeControl{
+		border: 1px solid #fff;
+		cursor: pointer;
+		float: left;
+		height: 25px;
+		margin: 0 5px;
+		position: relative;
+		widows: 60px;
+	}
+	#volume_background{
+		background-color: #ccc;
+		height: 25px;
+		width: 60px;
+	}
+	#volume_bar{
+		background: #fff;
+		color: #333;
+		height: 25px;
+		position: absolute;
+		text-align: center;
+		width: 0;
+	}
+	button{
+		background: #fff;
+		border: none;
+		border-radius: 12px;
+		cursor: pointer;
+		height: 27px;
+		padding: 0 5px;
+	}
+</style>
+</head>
+<body>
+    <div id="radioContainer">
+    	<h1>HTML5 Audio Stream Player</h1>
+    		<audio id="audioPlayer">
+    			<p>Your browser does not support the HTML5 audio element.</p>
+    		</audio>
+    		<div id="stations">
+    			<label for="stationList">Stations</label>
+    			<select id="stationList" size="5" onchange="setStation();"></select>
+    		</div>
+    		<div id="radioPlayer">
+    			<h2 id="radioStatus"></h2>
+    			<p id="currentStation"></p>
+    			<div id="radioControls">
+    				<div id="volumeTitle">Volume</div>
+    				<div id="volumeControl" onclick="volumeChangeClicked(event)";>
+    					<div id="volume_background">
+    						<div id="volume_bar"></div>
+    					</div>
+    				</div>
+    				<button id="buttonPlayPause" onclick="playPauseClicked();"></button>
+    			</div>
+    		</div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Database Grocery List</title>
+<style>
+	section{
+		margin-bottom: 20px;
+	}
+</style>
+<script>
+	var shoppingdb = null;
+	function init (argument) {
+		if(window.openDatabase){
+			var btnAddGroceryItem = document.getElementById('addGroceryItem');
+			var btnResetGroceryList = document.getElementById('resetGroceryList');
+			var btnRemoveDatabase = document.getElementById('removeDatabase');
+			btnAddGroceryItem.addEventListener('click', addGroceryItem,false);
+			btnResetGroceryList.addEventListener('click', resetGroceryList,false);
+			btnRemoveDatabase.addEventListener('click', removeDatabase,false);
+			//Open the database
+			openShoppingDb();
+			if(shoppingdb){
+				dbPresent();
+			}
+		}else{
+			alert("Databases are not supported in this browser.");
+		}
+	}
+	function openShoppingDb (argument) {
+		try{
+			var dbSize = 500000;
+			shoppingdb = openDatabase('shoppingdb', '1.0', 'shopping list', dbSize);
+		}catch(err){
+			shoppingdb = null;
+			console.log("Error opening database: " + err.code + '-' + err.message);
+			return;
+		}
+	}
+	function dbPresent (argument) {
+		shoppingdb.readTransaction(function  (tx) {
+			//execute sql;
+			tx.executeSql('SELECT 1 FROM departments',[],initPage, initShoppingDb);
+		});
+	}
+
+	function initPage (argument) {
+		 getDepartments();
+		 getGroceryItems(); 
+	}
+	function initShoppingDb (argument) {
+		 shoppingdb.transaction(function (tx) {
+		 	 tx.executeSql('CREATE TABLE IF NOT EXISTS '+'groceryitems(itemid INTERGER NOT NULL PRIMARY KEY, quantity INTEGER, itemname TEXT, deptid INTEGER)', [], nullHandler, onDbError);
+		 	 tx.executeSql('CREATE TABLE IF NOT EXISTS '+'departments(deptid INTERGER NOT NULL PRIMARY KEY, deptname TEXT)', [], nullHandler, onDbError);
+		 	 tx.executeSql('INSERT INTO departments(deptname) VALUES (?)', ['Fresh Produce'], nullHandler, onDbError);
+		 	 tx.executeSql('INSERT INTO departments(deptname) VALUES (?)', ['Deli'], nullHandler, onDbError);
+		 	 tx.executeSql('INSERT INTO departments(deptname) VALUES (?)', ['Bakery'], nullHandler, onDbError);
+		 	 tx.executeSql('INSERT INTO departments(deptname) VALUES (?)', ['Grocery'], nullHandler, onDbError);
+		 });
+	}
+	function onDbError (tx,err) {
+		 alert("Database error occurred: " + err.code + '|' + err.message); 
+	}
+	function nullHandler (tx, err) {
+		 return; 
+	}
+	function getDepartments (argument) {
+		 shoppingdb.readTransaction(function (tx) {
+		 	 tx.executeSql('SELECT * FROM departments ORDER BY deptname ASC',[], showDepartments, onDbError); 
+		 }); 
+	}
+	function showDepartments (tx, rs) {
+		 var selectObj = document.getElementById('department');
+		 for (var i = 0; i < rs.rows.length; i++) {
+		  	row = rs.rows.item(i);
+		  	selectObj.options[selectObj.options.length] = new Option(row.deptname, row.deptid, false,false);
+		  }; 
+	}
+	function getGroceryItems (argument) {
+		 shoppingdb.readTransaction(function (tx) {
+		 	 tx.executeSql('SELECT * FROM groceryitems, departments WHERE groceryitems.deptid=departments.deptid ORDER BY deptname ASC',[], showGroceryItems, onDbError); 
+		 }); 
+	}
+	function showGroceryItems (tx, rs) {
+		 var myShoppingList = document.getElementById('myShoppingList');
+		 var tableRow = '<table>', row = null;
+		 tableRow +='<tr><td>Quantity</td><td>Item</td><td>Department</td><td>Delete</td></tr>';
+		 for (var i = 0; i < rs.rows.length; i++) {
+		  	row = rs.rows.item(i);
+		  	tableRow += '<tr><td>' + row.quantity +'</td><td>' + row.itemname +'</td><td>' + row.deptname +'</td><td>' + row.quantity +'</td><td><button onclick="deleteItem(' + row.itemid +');">X</button></td></tr>'; 
+		  }; 
+		  tableRow += '</table>';
+		  myShoppingList.innerHTML = tableRow;
+	}
+	function addGroceryItem (argument) {
+		 shoppingdb.transaction(function (tx) {
+		 	 var itemname = document.getElementById('item').value;
+		 	 var quantity = parseInt(document.getElementById('quantity').value);
+		 	 var deptid = parseInt(document.getElementById('department').value);
+		 	 tx.executeSql('INSERT INTO groceryitems(quantity, itemname, deptid) VALUES (?,?,?)', [quantity, itemname, deptid], getGroceryItems, onDbError);
+		 });
+	}
+	function deleteItem (id) {
+		 shoppingdb.transaction(function (tx) {
+		 	 tx.executeSql('DELETE FROM groceryitems WHERE itemid=?', [id], getGroceryItems, onDbError);
+		 });
+	}
+	function resetGroceryList (argument) {
+		 shoppingdb.transaction(function (tx) {
+		 	 tx.executeSql('DROP TABLE groceryitems', [], nullHandler, onDbError);
+		 });
+	}
+	function removeDatabase (argument) {
+		  shoppingdb.transaction(function (tx) {
+		 	 tx.executeSql('DROP TABLE departments', [], nullHandler, onDbError);
+		 	 tx.executeSql('DROP TABLE groceryitems', [], nullHandler, onDbError);
+		 });
+	}
+	window.addEventListener('load', init, false);
+</script>
+</head>
+<body>
+    <section>
+    	Quantity: <input type="number" id="quantity">
+    	Item: <input type="text" id="item" placeholder="Milk">
+    	Department: <select id="department"></select>
+    	<button id="addGroceryItem">Add Item</button>
+    </section>
+    <section id="myShoppingList"></section>
+    <section>
+    	<button id="resetGroceryList">Reset Grocery List</button>
+    	<button id="removeDatabase">Remove Database</button>
+    </section>
+</body>
+</html>

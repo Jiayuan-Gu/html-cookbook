@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Growing Bar Chart</title>
+<style>
+	h1{
+		text-align: center;
+	}
+	#graph{
+		border: 1px solid #03f;
+		margin: 0 auto;
+	}
+</style>
+<script>
+	var canvas,context;
+	var chartMargin,chartAxisSpace,chartWidth,chartHeight;
+	var numBars=0,barMargin=20,barWidth=0,maxValue=0;
+	var numYLabels,idxStep,numSteps,growSpeed;
+	//JSON sample data
+	var chartData={
+		'bars':[
+			{'title':'Year 1','value':'7'},
+			{'title':'Year 2','value':'12'},
+			{'title':'Year 3','value':'20'},
+			{'title':'Year 4','value':'33'},
+			{'title':'Year 5','value':'55'},
+			{'title':'Year 6','value':'93'},
+			{'title':'Year 7','value':'156'},
+		]
+	}
+
+	function initGraph () {
+		 canvas = document.getElementById('graph');
+		 context = canvas.getContext('2d');
+		 initSettings();
+		 drawAxis();
+		 growBars(); 
+	}
+
+	function initSettings (argument) {
+		 chartMargin = 20;
+		 chartAxisSpace = 50;
+		 chartHeight = canvas.height - chartAxisSpace - 2 * chartMargin;
+		 chartWidth = canvas.width - chartAxisSpace - 2 *chartMargin;
+
+		 numYLabels = 8;
+		 numBars=chartData.bars.length;
+		 for(var i=0; i<numBars; ++i){
+		 	if(chartData.bars[i].value > maxValue){
+		 		maxValue = parseInt(chartData.bars[i].value);
+		 	}
+		 }
+
+		 barWidth = (chartWidth / numBars) - barMargin;
+		 idxStep = 0;
+		 numSteps = 100;
+		 growSpeed = 6;
+	}
+
+	function drawAxis (argument) {
+		 context.lineWidth = 2;
+		 //y-axis
+		 context.moveTo(chartMargin + chartAxisSpace, chartHeight + chartMargin);
+		 context.lineTo(chartMargin + chartAxisSpace, chartMargin);
+		 context.stroke();
+		 //x-axis
+		 context.moveTo(chartMargin + chartAxisSpace, chartHeight + chartMargin);
+		 context.lineTo(chartMargin + chartAxisSpace + chartWidth, chartHeight + chartMargin);
+		 context.stroke();
+
+		 context.lineWidth=1;
+		 var markerAmount = parseInt(maxValue / numYLabels);
+		 context.textAlign = 'right';
+		 context.fillStyle = '#000';
+		 for(var i=0; i <= numYLabels; ++i){
+		 	markerLabel=i*markerAmount;
+		 	markerXPos = chartMargin + chartAxisSpace -5;
+		 	markerYPos = chartMargin + (chartHeight - (i * markerAmount *chartHeight)/ maxValue);
+		 	context.fillText(markerLabel, markerXPos, markerYPos, chartAxisSpace);
+		 }
+		 context.textAlign = 'center';
+		 for(var i=0; i<numBars; ++i){
+		 	markerXPos = chartMargin + chartAxisSpace + barMargin + i*(barWidth+barMargin) + (.5 * barWidth);
+		 	markerYPos = chartMargin + chartHeight + 10;
+		 	context.fillText(chartData.bars[i].title, markerXPos, markerYPos, barWidth);
+		 }
+
+		 context.save();
+		 context.translate(chartMargin + 10, chartHeight/2);
+		 context.rotate(Math.PI /2 );
+		 context.fillText('Sales (in 000s)',0,0);
+		 context.restore();
+
+		 context.fillText("Year Out", chartMargin + chartAxisSpace + chartWidth/2, chartMargin + chartHeight + 40);
+	}
+
+	function growBars (argument) {
+		 var barStartX=0, barStartY=0; barHeight = 0;
+		 var barValue = 0;
+		 for(var i=0; i<numBars; ++i){
+		 	barValue = parseInt(chartData.bars[i].value);
+		 	barHeight = (barValue * chartHeight / maxValue) / numSteps * idxStep;
+		 	barStartX = chartMargin + chartAxisSpace + i*(barWidth+barMargin) + barMargin;
+		 	barStartY = chartMargin + chartHeight - barHeight;
+		 	drawBar(barStartX, barStartY, barWidth, barHeight);
+		 } 
+		 if(idxStep < numSteps){
+		 	idxStep++;
+		 	setTimeout('growBars()', growSpeed);
+		 }
+	}
+
+	function drawBar (barX, barY, barW, barH) {
+		 context.fillStyle = "#00c";
+		 context.fillRect(barX, barY, barW, barH);
+
+		 context.shadowOffsetX = 3;
+		 context.shadowOffsetY = -3;
+		 context.shadowBlur = 3;
+		 context.shadowColor = "rgba(200,200,200,.3)";
+
+		 context.strokeStyle = "#000";
+		 context.lineWidth = 1;
+		 context.strokeRect(barX, barY, barW, barH);
+	}
+	window.addEventListener('load', initGraph,false);
+</script>
+</head>
+<body>
+    <h1>Growing Bar Chart</h1>
+    <center>
+    	<canvas id="graph" width="600" height="400"></canvas>
+    </center>
+</body>
+</html>

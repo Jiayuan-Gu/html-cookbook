@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Canvas Grid System</title>
+<style>
+	canvas{
+		border: 1px solid #03F;
+		background: #CFC;
+	}
+</style>
+<script>
+	var canvas,context;
+	function showGrid(){
+		canvas = document.getElementById("mycanvas");
+		context = canvas.getContext("2d");
+
+		context.lineWidth = 1;
+		context.strokeStyle = "#999";
+
+		var lineSpacing = 100, xPos=0, yPos=0;
+		var numHorizon = parseInt(canvas.height/lineSpacing);
+		var numVertic = parseInt(canvas.width/lineSpacing);
+
+		for(var i=1; i<=numHorizon; ++i){
+			yPos=i*lineSpacing;
+			context.moveTo(0,yPos);
+			context.lineTo(canvas.width,yPos);
+			context.stroke();
+		}
+
+		for(var i=1; i<=numVertic; ++i){
+			xPos=i*lineSpacing;
+			context.moveTo(xPos,0);
+			context.lineTo(xPos,canvas.height);
+			context.stroke();
+		}
+		alert("function execute!");
+	}
+	window.addEventListener("load", showGrid);
+</script>
+</head>
+<body>
+    <canvas id="mycanvas" width="640" height="480"></canvas>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Big sign-up form</title>
+<style>
+	*{
+		margin: 0;
+		padding: 0;
+	}
+	body{
+		background: #fff;
+		color: #000;
+		font: normal 62.5%/1.5 tahoma, verdana, sans-serif;
+	}
+	h1{
+		font-size: 2.9em;
+		font-weight: bold;
+		margin: 1em 0 1em 10px;
+	}
+	form{
+		padding: 0 10px;
+		width: 700px;
+	}
+	legend{
+		left: -9999px;
+		position: absolute;
+	}
+	fieldset{
+		border: 1px solid #ccc;
+		border-radius: 5px;
+		float: left;
+		padding: 10px;
+		width: 320px;
+	}
+	fieldset:nth-of-type(1){
+		margin-right: 10px;
+	}
+	li{
+		clear: both;
+		list-style-type: none;
+		margin: 0 0 10px;
+	}
+	label, input{
+		font-style: 1.3em;
+	}
+	label{
+		display: block;
+		padding: 0 0 5px;
+		width: 200px;
+	}
+	input:{
+		background-position: 295px 5px;
+		background-repeat: no-repeat;
+		border: 2px solid #ccc;
+		border-radius: 5px;
+		padding: 5px 25px 5px 5px;
+		width: 285px;
+	}
+	input:focus{outline: none;}
+	input:invalid:required{
+		background-image: url(1.jpg);
+		-webkit-box-shadow: none;
+		box-shadow: none;
+	}
+	input:focus:invalid{
+		background-image: url(2.jpg);
+		box-shadow: 0px 0px 5px #b01212;
+		border-bottom: 2px solid #b01212;
+	}
+	input:valid:required{
+		background-image: url(3.jpg);
+		border: 2px solid #7ab526;
+	}
+	input[type=date], input[type=number]{
+		background-position: 275px 5px;
+		text-align: left;
+	}
+	input[type=color], input[type=range]{
+		padding-right: 5px;
+	}
+	input[type=range]:before{content: "1";}
+	input[type=range]:after{content: "10";}
+	div #range label{font-weight: bold;}
+	output{
+		font-size: 1.3em;
+		font-weight: bold;
+		display: block;
+		text-align: center;
+	}
+	div{
+		clear: both;
+		float: left;
+		margin: 10px 0;
+		text-align: center;
+		width: 100%;
+	}
+	div label{width: 100%;}
+	input[type=submit]{
+		background: #7ab526;
+		border: none;
+		box-shadow: 0 0 5px #7ab526;
+		color: #fff;
+		cursor: pointer;
+		font-size: 3em;
+		font-weight: bold;
+		margin: 20px auto;
+		padding: 15px;
+		width: auto;
+	}
+	input[type=submit]:hover{
+		box-shadow: 0px 0px 25px #7ab526;
+	}
+</style>
+</head>
+<body>
+    <h1>Sign up here</h1>
+    <form onsubmit="alert('You have submit.')">
+    	<fieldset>
+    		<legend>Personal info</legend>
+    		<ol>
+    			<li>
+    				<label for="name">Name</label>
+    				<input type="tel" autofocus required id="name">
+    			</li>
+    			<li>
+    				<label for="birthday">Birthday</label>
+    				<input type="date" required id="birthday">
+    			</li>
+    			<li>
+    				<label for="website"></label>
+    				<input type="url" id="website" placeholder="http://mysite.com" pattern="(http|https)://([\w-]+\.)+[\w-]+(/[\w- ./?&%=]*)?">
+    			</li>
+    			<li>
+    				<label for="job">Job</label>
+    				<input type="text" list="joblist" required id="job">
+    				<datalist id="joblist">
+    					<option value="Space Cowboy" label="Space Cowboy"></option>
+						<option value="International Playboy" label="International Playboy"></option>
+    				</datalist>
+    			</li>
+    			<li>
+    				<label for="salary">Approx. annual salary</label>
+    				<input type="number" placeholder="&#36;" required min="0" step="1000" id="salary">
+    			</li>
+    		</ol>
+    	</fieldset>
+    	<fieldset>
+    		<legend>Contact info</legend>
+    		<ol>
+    			<li>
+    				<label for="address1">Address line 1</label>
+    				<input type="text" required id="address1">
+    			</li>
+    			<li>
+    				<label for="tel">Tel</label>
+    				<input type="email" required id="email">
+    			</li>
+    		</ol>
+    	</fieldset>
+    	<div id="personalise">
+    		<h2>Personalise your profile</h2>
+    		<label for="color">Choose a page color</label>
+    		<input type="color" id="color">
+    	</div>
+    	<div id="range">
+    		<label for="excited">Finally, on a scale of 1 to 10, how excited are you about HTML5 forms?</label>
+    		<input type="range" min="1" max="10" step="0.5" id="excited">
+    		<output onforminput="value=excited.value+' / 10' "></output>
+    		<input  type="submit" value="Sign up">
+    	</div>
+    </form>
+</body>
+</html>

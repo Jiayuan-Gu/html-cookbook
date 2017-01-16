@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Basic Drag and Drop</title>
+<style>
+	#notes{
+		float: left;
+		height: 220px;
+		width: 50px;
+		text-align: center;
+		border-style: solid;
+		border-width: 2px;
+		border-color: #333;
+		background-color: #666;
+	}
+	#board{
+		float: left;
+		width: 300px;
+		height: 220px;
+		border-style: solid;
+		border-width: 2px;
+		border-color: #333;
+		background-image: url('1.jpg');
+	}
+</style>
+<script>
+	var imgOffsetX = 0, imgOffsetY = 0;
+	function dragStartHandler (tgt,evt) {
+		 evt.dataTransfer.setData("Text", tgt.id); 
+	}
+	function dropHandler (tgt,evt) {
+		 if(evt.preventDefault){
+		 	evt.preventDefault();
+		 } 
+		 var elImgId = evt.dataTransfer.getData("Text");
+		 var oImg = new Image();
+		 oImg.src = document.getElementById(elImgId).src;
+		 oImg.style.position = 'absolute';
+		 var newX = evt.x - imgOffsetX, newY = evt.y - imgOffsetY;
+		 var divLeft = tgt.x, divTop = tgt.y;
+		 var divWidth = parseInt(tgt.style.width), divHeight = parseInt(tgt.style.height);
+		 // make sure image is fully in the div
+		 var imgWH = 50;
+		 if(newX < tgt.offsetLeft){
+		 	newX = tgt.offsetLeft;
+		 }else if (newX + imgWH > tgt.offsetLeft + divWidth) {
+		 	newX = tgt.offsetLeft + divWidth - imgWH;
+		 }
+		 if(newY < tgt.offsetTop){
+		 	newY = tgt.offsetTop;
+		 }else if (newY + imgWH > tgt.offsetTop + divHeight) {
+		 	newY = tgt.offsetTop + divHeight - imgWH;
+		 }
+
+		 oImg.style.left = newX + 'px';
+		 oImg.style.top = newY + 'px';
+		 tgt.appendChild(oImg);
+	}
+	function getStartPos (evt) {
+		 imgOffsetX = evt.offsetX;
+		 imgOffsetY = evt.offsetY; 
+	}
+</script>
+</head>
+<body>
+    <h1>Drag notes to the corkboard:</h1>
+    <div id="notes">
+    	<img src="2.jpg" alt="2.jpg" id="pic2" onmousedown="getStartPos(event);" ondragstart = "dragStartHandler(this,event);"><br>
+    	<img src="3.jpg" alt="3.jpg" id="pic3" onmousedown="getStartPos(event);" ondragstart = "dragStartHandler(this,event);"><br>
+    </div>
+    <div id="board" dropzone="copy" ondrop="dropHandler(this,event);" ondragover="return false;"></div>
+</body>
+</html>

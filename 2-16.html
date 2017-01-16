@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Blog comments</title>
+<style>
+	[role=banner] h1
+	{
+		background: #333;
+		color: #fff;
+		padding: 5px;
+	}
+	[role=main] h1
+	{
+		border-bottom: 2px dotted #333;
+		color: #333;
+	}
+	b
+	{
+		float: left;
+		font-family: "Palatino Linotype",Palatino,serif;
+		font-size: 2.5em;
+		font-style: italic;
+		font-weight: bold;
+		line-height: 1;
+		margin: 0 5px 5px 0;
+	}
+</style>
+</head>
+<body>
+    <h1 role="banner">Gujy's blog</h1>
+    <article role="main">
+    	<header>
+    		<h1>Title</h1>
+    		<time pubdate datetime="2016-1-20">Wednesday, 20th Janurary</time>
+    		<p><b>A</b>rticle is shown here.</p>
+    	</header>
+    	<section>
+    		<h2>Comments</h2>
+    		<ol reversed>
+    			<li>
+    				<article>
+    					<h3>time here</h3>
+    					<footer>Comment by <a href="#">Gujy</a></footer>
+    					<p>a splendid article!</p>
+    				</article>
+    			</li>
+    		</ol>
+    	</section>
+    </article>
+</body>
+</html>

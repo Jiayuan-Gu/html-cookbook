@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Image Viewer</title>
+<style>
+	div .imgView{height: 300px;}
+	div .imgView img{height: 300px;}
+	div .imgRow img {height: 100px;}
+	a{cursor: pointer;}
+</style>
+</head>
+<body>
+    <script>
+    	var currentImg = 1;
+    	function showImage (imgNum) {
+    		 if(typeof(history.pushState) != "undefined"){
+    		 	if(currentImg != imgNum){
+    		 		var imgTitle = 'Img' + imgNum;
+    		 		history.pushState(imgNum, imgTitle, '?img=' + imgNum);
+    		 		document.getElementById('imgSlide').src= imgNum + '.jpg';
+    		 		alert(toString(imgNum) + '.jpg');
+    		 		document.title = 'Image' + imgNum;
+    		 		var stateInfo = document.getElementById('stateInfo');
+    		 		stateInfo.innerHTML = imgTitle + "<br>" +stateInfo.innerHTML;
+    		 		currentImg = imgNum;
+    		 	}
+    		 }else{
+    		 	alert('The History API is not available in this browser.');
+    		 }
+    	}
+    </script>
+    <div id="imgView" class="imgView">
+    	<img src="1.jpg" alt="1.jpg" id="imgSlide" style="height:300px">
+    </div>
+    <div id="imgRow" class="imgRow"></div>
+    <script>
+    	var newImg;
+    	var imgRow = document.getElementById("imgRow");
+    	for (var i = 1; i <= 3; i++) {
+    		newImg = '<a onclick="showImage('+i+');">pic'+i+'.jpg</a><br/>';
+    		imgRow.innerHTML += newImg;
+    	};
+    </script>
+    <div id='stateInfo'>Image 1</div>
+</body>
+</html>

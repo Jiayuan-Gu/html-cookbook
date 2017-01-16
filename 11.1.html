@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Session Storage Page</title>
+<script>
+	function init (argument) {
+		 var divVisits = document.getElementById('divVisits');
+		 //check browser support
+		 if(window.sessionStorage){
+		 	var visits;
+		 	if(sessionStorage.visits){
+		 		visits = parseInt(sessionStorage.getItem('visits'));
+		 		visits++;
+		 	}else{
+		 		visits = 1;
+		 	}
+		 	sessionStorage.setItem('visits',visits);
+		 	divVisits.innerHTML = 'Session page visits: ' + visits;
+		 }
+	}
+	window.addEventListener('load', init, false);
+</script>
+</head>
+<body>
+    <div id="divVisits"></div>
+</body>
+</html>

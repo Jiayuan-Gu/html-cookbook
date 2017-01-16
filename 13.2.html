@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Towers Game</title>
+<style>
+	.towerDropZone{
+		float: left;
+		height: 200px;
+		width: 200px;
+		margin: 5px;
+		padding: 15px;
+		position: relative;
+		background-color: #fff;
+		background-image: url(tower.jpg);
+		background-repeat: no-repeat;
+		background-position: bottom;
+	}
+	.towerDropZone.over{
+		border-radius: 15px 15px;
+		background-color: #eee;
+	}
+	.tower{
+		width: 200px;
+		position: absolute;
+		bottom: 1px;
+		border: none;
+	}
+	.block{
+		height: 25px;
+		margin: 1px auto;
+		border: 1px solid #ccc;
+		border-radius: 15px 15px;
+		background-color: #00f;
+		color: #fff;
+		text-align: center;
+		font-size: 19px;
+		font-weight: bold;
+	}
+</style>
+<script>
+	var towers = [[],[],[]];
+	var numblocks = 4, numMoves = 0;
+	function initTowers (argument) {
+		 var towerDropZones = document.querySelectorAll('#towers .towerDropZone');
+		 [].forEach.call(towerDropZones, function (tdz) {
+		 	 tdz.addEventListener('dragover', towerHandleDragOver, false);
+		 	 tdz.addEventListener('drop', towerHandleDragDrop, false);
+		 	 tdz.addEventListener('dragleave', towerHandleDragLeave, false);
+		 });
+
+		 var blocks = document.querySelectorAll('.block');
+		 [].forEach.call(blocks, function (block) {
+		 	 block.addEventListener('dragstart', blockHandleDragStart, false);
+		 	 block.addEventListener('dragend', blockHandleDragEnd, false);
+		 });
+
+		 for(var i = numblocks; i>0 ; --i){
+		 	towers[0].push(i);
+		 	document.getElementById(i+'block').style.width = (90 + i*30) + "px";
+		 }
+	}
+	function towerHandleDragOver (e) {
+		 if(e.preventDefault){
+		 	e.preventDefault();
+		 } 
+		 e.dataTransfer.dropEffect = 'move'; // copy, move...
+		 this.className = "towerDropZone over"; //change the syle
+		 return false;
+	}
+
+	function towerHandleDragLeave (e) {
+		 this.className = "towerDropZone";
+	}
+
+	function towerHandleDragDrop (e) {
+		 if(e.preventDefault){
+		 	e.preventDefault();
+		 } 
+		 this.className = "towerDropZone";
+		 var blockInfo = JSON.parse(e.dataTransfer.getData("Text"));
+
+		 var blockId = blockInfo.blockId, blockNum = parseInt(blockInfo.blockId);
+		 var fromTowerId = parseInt(blockInfo.fromTowerId),toTowerId = parseInt(this.id);
+		 var tower = document.getElementById(toTowerId + 'tower');
+
+		 //Logical judgement
+		 var towerheight = towers[toTowerId].length;
+		 if(towerheight == 0 ){
+		 	tower.insertBefore(document.getElementById(blockId), document.getElementById("p"+toTowerId));
+		 }else {
+		 	var topBlock = towers[toTowerId][towerheight - 1];
+		 	if(topBlock > blockNum){
+		 		tower.insertBefore(document.getElementById(blockId), document.getElementById(topBlock+"block"));
+		 	}else{
+		 		return false;
+		 	}
+		 }
+		 towers[toTowerId].push(blockNum);
+		 towers[fromTowerId].pop();
+		 numMoves++;
+		 document.getElementById("numMoves").textContent = numMoves;
+		 //check if game is over
+		 if(towers[2].length == numblocks){
+		 	var blocks = document.querySelectorAll('.block');
+		 	[].forEach.call(blocks,function (block) {
+		 		 block.draggable =false; 
+		 	});
+		 	alert("Congratulations - you have moved the tower.");
+		 }
+	}
+
+	function blockHandleDragStart (e) {
+		 var blockId = this.id;
+		 var fromTowerId = parseInt(this.parentNode.id);
+		 var towerheight = towers[fromTowerId].length;
+		 var topBlock = towers[fromTowerId][towerheight-1];
+		 var thisBlock = parseInt(blockId);
+
+		 //check if the top block is to be moved
+		 if(topBlock == thisBlock){
+		 	this.style.opacity = '0.4';
+		 	var blockInfo = {
+		 		"blockId":blockId,
+		 		"fromTowerId":fromTowerId
+		 	};
+		 	e.dataTransfer.setData("Text",JSON.stringify(blockInfo));
+		 } else {
+		 	this.style.opacity = '1.0';
+		 	return false;
+		 }
+	}
+	function blockHandleDragEnd (e) {
+		 this.style.opacity = '1.0'; 
+	}
+	window.addEventListener('load', initTowers, false);
+</script>
+</head>
+<body>
+    <h1>Towers Game</h1>
+    <p>Move the pieces on the left stack to the right most tower<br>
+    A block may only be moved onto an empty tower or a tower with a larger block</p>
+    <div>Number of moves made:<span id="numMoves">0</span></div>
+    <section id="towers">
+    	<div class="towerDropZone" id="0zone" dropzone="move">
+    		<div class="tower" id="0tower">
+    			<div class="block" id="1block" draggable="true">1</div>
+    			<div class="block" id="2block" draggable="true">2</div>
+    			<div class="block" id="3block" draggable="true">3</div>
+    			<div class="block" id="4block" draggable="true">4</div>
+    			<p id="p0"></p>
+    		</div>
+    	</div>
+    	<div class="towerDropZone" id="1zone" dropzone="move">
+    		<div class="tower" id="1tower"><p id="p1"></p></div>
+    	</div>
+    	<div class="towerDropZone" id="2zone" dropzone="move">
+    		<div class="tower" id="2tower"><p id="p2"></p></div>
+    	</div>
+    </section>
+</body>
+</html>

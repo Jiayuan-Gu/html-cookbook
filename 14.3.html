@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Processing Multiple Files with FileList</title>
+<style>
+	.highlight, .unhighlight{
+		max-height: 100px;
+		max-width: 100px;
+		border-radius: 5px;
+		margin: 10px;
+	}
+	.highlight{
+		border: 5px solid #6f0;
+	}
+	.unhighlight{
+		border: 5px solid #000;
+	}
+</style>
+<script>
+	function handleFiles (files) {
+		 var fileLimit = 10, sizeLimit = 500, imageType = /image.*/;
+		 var imgPanel = document.getElementById('imgPanel');
+		 imgPanel.innerHTML = '';
+		 var sizeLimit = sizeLimit * 1024;
+
+		 if (files.length<fileLimit) {
+		 	for (var i = 0; i < files.length; i++) {
+		 		var file = files[i];
+		 		if (file.type.match(imageType)) {
+		 			if (file.size < sizeLimit) {
+		 				var img = document.createElement("img");
+		 				img.file = file;
+		 				img.className = 'unhighlight';
+		 				img.addEventListener('mouseover', showFile, false);
+		 				img.addEventListener('mouseout', clearFile, false);
+		 				imgPanel.appendChild(img);
+
+		 				var reader = new FileReader();
+		 				reader.onload = (function (aImg) {
+		 					 return function (e) {
+		 					 	 aImg.src = e.target.result; 
+		 					 } ;
+		 				})(img);
+		 				reader.readAsDataURL(file);
+		 			}else {
+		 				alert(file.name + ' is larger than ' + sizeLimit + 'KB.');
+		 			}
+		 		}else {
+		 			alert(file.name + 'is not an image.');
+		 		}
+		 	};
+		 }else {
+		 		imgPanel.innerHTML = "Only" + fileLimit + 'files can be selected at a time.';
+		 	}
+	}
+
+	function showFile (argument) {
+		 this.className = 'highlight';
+		 var fileAttributes = document.getElementById('fileAttributes'), file = this.file;
+		 var fileinfo = "File info:<br>"+file.name+"<br>"+file.type+"<br>"+(file.size/1024).toFixed(2)+"KB<br>"+file.lastModified+"<br>";
+		 fileAttributes.innerHTML = fileinfo;
+	}
+
+	function clearFile (argument) {
+		 var fileAttributes = document.getElementById('fileAttributes');
+		 fileAttributes.innerHTML = '';
+		 this.className = 'unhighlight';
+	}
+</script>
+</head>
+<body>
+    <h1>Select the images to preview.</h1>
+    <section id="fileSelection">
+    	<input type="file" id="input" multiple="true" onchange="handleFiles(this.files)">
+    </section>
+    <section id="imgPanel"></section>
+    <section id="fileAttributes"></section>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Worker Communication</title>
+<script>
+	var worker = new Worker("two_way_worker.js");
+	worker.onmessage = function (event) {
+		 var msgFromWorker = event.data;
+		 switch(msgFromWorker.msgType){
+		 	case 'MSG':
+				var workerResponse = document.getElementById('workerResponse');
+				workerResponse.innerHTML = "Worker sent: " + msgFromWorker.msg;	
+				break;
+			case 'ERR':
+				alert("Error from worker: " + msgFromWorker.msg);
+				break;
+		 } 
+	}
+	worker.onerror = function (error) {
+		 alert("Error from worker: " + error.message); 
+	}
+	function postToWorker (argument) {
+		 worker.postMessage(document.getElementById('inputForWorker').value); 
+	}
+	function init (argument) {
+		 document.getElementById('btnPostToWorker').addEventListener('click', postToWorker,false); 
+	}
+	window.addEventListener('load', init, false);
+</script>
+</head>
+<body>
+	<p>Enter a text message for the worker thread:</p>    
+	<input type="text" id="inputForWorker" />
+	<button id="btnPostToWorker">Send to Worker</button>
+	<section id="workerResponse"></section>
+</body>
+</html>
